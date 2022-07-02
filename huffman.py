@@ -1,18 +1,11 @@
-# A Huffman Tree Node
 
-
-# utility function to print huffman
-# codes for all symbols in the newly
-# created Huffman tree
-
-#bit_num = {}
 class huffman_main:
 	def __init__(self):
 		self.bit = {}
 		self.freq_dic = {}
 	class node:
 		def __init__(self, freq, symbol, left=None, right=None):
-		# frequency of symbol
+			# frequency of symbol
 			self.freq = freq
 
 			# symbol name (character)
@@ -28,18 +21,15 @@ class huffman_main:
 			self.huff = ''	
 
 	def printNodes(self, node, bit, val=''):
-		# huffman code for current node
 		newVal = val + str(node.huff)
 
-		# if node is not an edge node
-		# then traverse inside it
+	
 		if(node.left):
 			self.printNodes(node.left, bit, newVal)
 		if(node.right):
 			self.printNodes(node.right, bit, newVal)
     	#bit_num[node] = newVal 
-		# if node is edge node then
-		# display its huffman cod
+
         
 		if(not node.left and not node.right):
 			print(f"{node.symbol} -> {newVal}")
@@ -67,10 +57,6 @@ class huffman_main:
 		nodes = []
 	#bit_num = {}
 
-	# converting characters and frequencies
-	# into huffman tree nodes
-	#for x in range(len(freq_dic)):
-		#nodes.append(node(freq[x], chars[x]))
 		for num in self.freq_dic.keys():
 			nodes.append(self.node(self.freq_dic[num], num))    
 

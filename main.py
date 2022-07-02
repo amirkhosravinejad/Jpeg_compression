@@ -52,7 +52,6 @@ def block_8x8(width, height):
     for i in range(0, width, 8):
         for j in range(0, height, 8):
             arr = [[0] * 8 ] * 8
-            #c = 0
             for b_x in range(i, i + 8):
                 for b_y in range(j, j + 8):
                     if (b_x >= width) or (b_y >= height):
@@ -72,7 +71,6 @@ def block_8x8(width, height):
                 for s2 in range(8):
                     lis_.append((dct_out_Y[s1][s2], dct_out_Cb[s1][s2], dct_out_Cr[s1][s2]))
                 list_asli.append(lis_)"""
-            
             dcts[i][j] = dct_2D(arr)
             #print("i = {}, j = {}".format(i, j))       
             #print(dcts[i][j]) 
@@ -109,7 +107,6 @@ def quantization_and_round(dcts, height, width):
       99,  99,  99,  99,  99,  99,  99,  99,
       99,  99,  99,  99,  99,  99,  99,  99],dtype=int)
     chrominance_quant_table = chrominance_quant_table.reshape([8,8])
-    prev_pcm = (0, 0, 0)
     list_of_firsts = []
     for i in range(0, width, 8):
         for j in range(0, height, 8):
@@ -243,20 +240,53 @@ def zigzag(quantized_block):
                 vector_64.append(quantized_block[j][sum - j])
                 #print(j, sum - j)
     AC_components = RLC(vector_64)
-    return AC_components
+    #return AC_components
 
 def RLC(list):
-    pre_freq_z = 0
-    rlc_list = []
+    pre_freq_zy = pre_freq_zCb = 0
+    pre_freq_zCr = 0
+
+    rlc_list_Y = []
+    rlc_list_Cb = []
+    rlc_list_Cr = []
     for i in range(1, len(list)):
-        if list[i] != 0:
-            rlc_list.append((pre_freq_z, list[i]))
-            pre_freq_z = 0
+        #if i == 0:
+            #print(list[i])
+        if list[i][0] != 0:
+            #rlc_list_Y.append((pre_freq_zy, list[i][0]))
+            rlc_list_Y.append(pre_freq_zy)
+            pre_freq_zy = 0
         else:
-            pre_freq_z += 1
-    rlc_list.append((0, 0))  
-    return rlc_list
-    #print(vector_64)            
+            pre_freq_zy += 1
+        if list[i][1] != 0:
+            #rlc_list_Cb.append((pre_freq_zCb, list[i][1]))
+            rlc_list_Cb.append(pre_freq_zCb)
+            pre_freq_zCb = 0
+        else:
+            pre_freq_zCb += 1
+        if list[i][2] != 0:
+            #rlc_list_Cr.append((pre_freq_zCr, list[i][2]))
+            rlc_list_Cr.append(pre_freq_zCr)
+            pre_freq_zCr = 0
+        else:
+            pre_freq_zCr += 1        
+    rlc_list_Y.append(0)
+    rlc_list_Cb.append(0)
+    rlc_list_Cr.append(0)
+    #print(rlc_list_Y)
+    AC = {}      
+    AC_f = open("AC_file", "ab")   
+    h1 = huffman.huffman_main()
+    AC["Y"] = h1.main(rlc_list_Y)
+    
+    h1 = huffman.huffman_main()
+    AC["Cb"] = h1.main(rlc_list_Cb)
+
+    h1 = huffman.huffman_main()
+    AC["Cr"] = h1.main(rlc_list_Cr)
+
+    pickle.dump(AC, AC_f)
+    #return rlc_list         
 
 
 image_ = im.open('photo1.png')
